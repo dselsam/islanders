@@ -6,14 +6,19 @@
 
 import .util .knows .problem
 
-@[reducible] def n_people : ℕ := 2
+theorem islanders_n2 : islanders 2 :=
 
-axiom everyone_sees₁ : mk_everyone_sees₁ n_people
-axiom everyone_sees₂ : mk_everyone_sees₂ n_people
-axiom oracle         : mk_oracle n_people
-axiom nobody_leaves  : mk_nobody_leaves n_people
+assume everyone_sees₁ :
+  ∀ (d₁ d₂ : day) (p₁ p₂ : person), p₂ ≠ p₁ → common_knowledge (is_marked p₂ → knows d₂ p₁ (is_marked p₂)) d₁,
 
-theorem islanders : knows 2 1 (is_marked 1) :=
+assume everyone_sees₂ :
+  ∀ (d₁ d₂ : day) (p₁ p₂ : person), p₂ ≠ p₁ → common_knowledge (¬ is_marked p₂ → knows d₂ p₁ (¬ is_marked p₂)) d₁,
+
+assume oracle :
+  ∀ (d : day) (p : person) (k : ℕ), common_knowledge (knows (d+1) p (reduce_or (list.map is_marked (list.range 2)))) (d+1+k),
+
+assume nobody_leaves :
+  ∀ (d : day) (p : person), d+1 < 2 → common_knowledge (¬ knows (d+1) p (is_marked p)) (d+2),
 
 have H1 : knows 1 1 (¬ is_marked 1 → knows 1 0 (is_marked 0 ∨ is_marked 1)), from
   knows_lam 1 1 1 [] (λ _, oracle 0 0 0 [1]),
