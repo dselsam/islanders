@@ -8,11 +8,9 @@ import .util .knows .problem
 
 theorem islanders_n2 : islanders 2 :=
 
-assume everyone_sees₁ :
-  ∀ (d₁ d₂ : day) (p₁ p₂ : person), p₂ ≠ p₁ → common_knowledge (is_marked p₂ → knows d₂ p₁ (is_marked p₂)) d₁,
-
-assume everyone_sees₂ :
-  ∀ (d₁ d₂ : day) (p₁ p₂ : person), p₂ ≠ p₁ → common_knowledge (¬ is_marked p₂ → knows d₂ p₁ (¬ is_marked p₂)) d₁,
+assume everyone_sees :
+  ∀ (d₁ d₂ : day) (p₁ p₂ : person), p₂ ≠ p₁ → common_knowledge (is_marked p₂ → knows d₂ p₁ (is_marked p₂)) d₁
+                                            ∧ common_knowledge (¬ is_marked p₂ → knows d₂ p₁ (¬ is_marked p₂)) d₁,
 
 assume oracle :
   ∀ (d : day) (p : person) (k : ℕ), common_knowledge (knows (d+1) p (reduce_or (list.map is_marked (list.range 2)))) (d+1+k),
@@ -24,7 +22,7 @@ have H1 : knows 1 1 (¬ is_marked 1 → knows 1 0 (is_marked 0 ∨ is_marked 1))
   knows_lam 1 1 1 [] (λ _, oracle 0 0 0 [1]),
 
 have H2 : knows 1 1 (¬ is_marked 1 → knows 1 0 (¬ is_marked 1)), from
-  everyone_sees₂ 1 1 0 1 (ne.symm nat.zero_ne_one) [1],
+  and.right (everyone_sees 1 1 0 1 (ne.symm nat.zero_ne_one)) [1],
 
 have H3 : knows 1 1 (¬ is_marked 1) → knows 1 1 (knows 1 0 (is_marked 0)), from
   assume h1 : knows 1 1 (¬ is_marked 1),
